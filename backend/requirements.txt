@@ -1,0 +1,7 @@
+# backend/requirements.txt
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+websockets==14.1
+aiohttp==3.11.11
+python-dotenv==1.0.1
+pydantic==2.10.4

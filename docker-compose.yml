@@ -1,0 +1,41 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: polymarket-backend
+    ports:
+      - "8899:8899"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./.env:/app/.env
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8899/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: polymarket-frontend
+    ports:
+      - "3999:3999"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # 可选：Watchtower 自动更新
+  # watchtower:
+  #   image: containrrr/watchtower
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   command: --interval 3600

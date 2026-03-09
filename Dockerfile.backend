@@ -1,0 +1,23 @@
+# Dockerfile.backend
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# 安装系统依赖
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# 安装Python依赖
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 复制代码
+COPY backend/ .
+
+# 创建日志目录
+RUN mkdir -p logs
+
+EXPOSE 8899
+
+CMD ["python", "main.py"]
