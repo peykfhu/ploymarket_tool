@@ -1,0 +1,81 @@
+
+@tailwind base;
+
+@tailwind components;
+
+@tailwind utilities;
+
+
+
+:root {
+
+  --bg-primary: #030712;
+
+  --bg-secondary: #111827;
+
+  --bg-card: #1f2937;
+
+  --text-primary: #f9fafb;
+
+  --text-secondary: #9ca3af;
+
+  --accent: #6366f1;
+
+  --green: #22c55e;
+
+  --red: #ef4444;
+
+}
+
+
+
+body {
+
+  background-color: var(--bg-primary);
+
+  color: var(--text-primary);
+
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+}
+
+
+
+::-webkit-scrollbar { width: 6px; }
+
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+
+::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+
+
+
+@keyframes countUp {
+
+  from { opacity: 0; transform: translateY(10px); }
+
+  to { opacity: 1; transform: translateY(0); }
+
+}
+
+.animate-count { animation: countUp 0.3s ease-out; }
+
+
+
+.pulse-dot {
+
+  width: 8px;
+
+  height: 8px;
+
+  border-radius: 50%;
+
+  animation: pulse 2s infinite;
+
+}
+
+.pulse-dot.green { background: #22c55e; }
+
+.pulse-dot.red { background: #ef4444; }
+
+.pulse-dot.yellow { background: #eab308; }
+
