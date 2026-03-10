@@ -1,10 +1,12 @@
+from typing import Dict, List, Optional
+from typing import Dict, List, Optional
 # backend/services/binance_client.py
 import aiohttp
 import asyncio
 import hmac
 import hashlib
 import time
-from typing import Optional, Dict
+from typing import Dict, List, Optional
 from config import config
 from utils.logger import get_logger
 

@@ -1,3 +1,5 @@
+from typing import Optional, Dict
+from typing import Optional, Dict
 # backend/services/notifier.py
 import aiohttp
 from typing import Optional

@@ -1,8 +1,10 @@
+from typing import Dict, List, Optional
+from typing import Dict, List, Optional
 # backend/services/news_scraper.py
 import aiohttp
 import asyncio
 import re
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 from datetime import datetime, timedelta
 from config import config
 from utils.logger import get_logger

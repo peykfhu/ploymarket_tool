@@ -1,51 +1,29 @@
-// frontend/src/api.ts
-const API_BASE = '/api';
 
-export async function fetchDashboard() {
-  const res = await fetch(`${API_BASE}/dashboard`);
-  if (!res.ok) throw new Error('Failed to fetch dashboard');
-  return res.json();
-}
+const A='/api';
 
-export async function fetchAgents() {
-  const res = await fetch(`${API_BASE}/agents`);
-  if (!res.ok) throw new Error('Failed to fetch agents');
-  return res.json();
-}
+export const fetchDashboard=async()=>(await fetch(`${A}/dashboard`)).json();
 
-export async function startAgent(name: string) {
-  const res = await fetch(`${API_BASE}/agents/${name}/start`, { method: 'POST' });
-  return res.json();
-}
+export const fetchAgents=async()=>(await fetch(`${A}/agents`)).json();
 
-export async function stopAgent(name: string) {
-  const res = await fetch(`${API_BASE}/agents/${name}/stop`, { method: 'POST' });
-  return res.json();
-}
+export const startAgent=async(n:string)=>(await fetch(`${A}/agents/${n}/start`,{method:'POST'})).json();
 
-export async function fetchTrades(limit = 100) {
-  const res = await fetch(`${API_BASE}/trades?limit=${limit}`);
-  return res.json();
-}
+export const stopAgent=async(n:string)=>(await fetch(`${A}/agents/${n}/stop`,{method:'POST'})).json();
 
-export async function fetchTradeStats() {
-  const res = await fetch(`${API_BASE}/trades/stats`);
-  return res.json();
-}
+export const fetchTrades=async(l=100)=>(await fetch(`${A}/trades?limit=${l}`)).json();
 
-export async function fetchLogs(agentName?: string) {
-  const url = agentName
-    ? `${API_BASE}/logs?agent_name=${agentName}`
-    : `${API_BASE}/logs`;
-  const res = await fetch(url);
-  return res.json();
-}
+export const fetchActivities=async(l=50)=>(await fetch(`${A}/activities?limit=${l}`)).json();
 
-export async function updateRiskSettings(settings: Record<string, any>) {
-  const res = await fetch(`${API_BASE}/settings/risk`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(settings),
-  });
-  return res.json();
-}
+export const fetchSettings=async()=>(await fetch(`${A}/settings`)).json();
+
+export const saveSettings=async(s:any)=>(await fetch(`${A}/settings`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(s)})).json();
+
+export const fetchScannedMarkets=async(cat?:string)=>(await fetch(`${A}/markets/scanned${cat?`?category=${cat}`:''}`)).json();
+
+export const fetchTradeStats=async()=>(await fetch(`${A}/trades/stats`)).json();
+
+export const fetchLogs=async(a?:string)=>(await fetch(`${A}/logs${a?`?agent_name=${a}`:''}`)).json();
+
+export const fetchLivePositions=async()=>(await fetch(`${A}/positions/live`)).json();
+
+export const closeTrade=async(id:number)=>(await fetch(`${A}/trades/${id}/close`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).json();
+

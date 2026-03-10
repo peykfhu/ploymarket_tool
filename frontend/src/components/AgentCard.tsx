@@ -1,129 +1,63 @@
-// frontend/src/components/AgentCard.tsx
-import React from 'react';
+
+import React, { useState } from 'react';
+
 import { AgentState } from '../types';
+
 import { startAgent, stopAgent } from '../api';
 
-interface Props {
-  agentKey: string;
-  agent: AgentState;
-}
+const icons: Record<string,string> = {weather:'🌦️',crypto:'₿',politics:'🏛️',sports:'🏥',endgame:'🎯',sports_endgame:'🏆'};
 
-const agentIcons: Record<string, string> = {
-  weather: '🌦️',
-  crypto: '₿',
-  politics: '🏛️',
-  sports: '🏥',
-};
+const grads: Record<string,string> = {weather:'from-blue-600 to-cyan-600',crypto:'from-orange-500 to-yellow-500',politics:'from-purple-600 to-pink-500',sports:'from-green-500 to-emerald-500',endgame:'from-red-500 to-orange-500',sports_endgame:'from-yellow-500 to-red-500'};
 
-const agentColors: Record<string, string> = {
-  weather: 'from-blue-600 to-cyan-600',
-  crypto: 'from-orange-600 to-yellow-600',
-  politics: 'from-purple-600 to-pink-600',
-  sports: 'from-green-600 to-emerald-600',
-};
+export function AgentCard({agentKey,agent}:{agentKey:string;agent:AgentState}) {
 
-export function AgentCard({ agentKey, agent }: Props) {
-  const icon = agentIcons[agentKey] || '🤖';
-  const gradient = agentColors[agentKey] || 'from-gray-600 to-gray-700';
-  const isRunning = agent.status === 'running';
+  const [busy,setBusy]=useState(false);
 
-  async function toggleAgent() {
-    try {
-      if (isRunning) {
-        await stopAgent(agentKey);
-      } else {
-        await startAgent(agentKey);
-      }
-    } catch (e) {
-      console.error('Failed to toggle agent', e);
-    }
-  }
+  const [opt,setOpt]=useState<string|null>(null);
 
-  return (
-    <div className={`
-      bg-gray-900 rounded-2xl p-5 border border-gray-800
-      hover:border-gray-700 transition-all duration-300
-      ${isRunning ? 'ring-1 ring-indigo-500/20' : ''}
-    `}>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className={`
-            w-10 h-10 rounded-xl bg-gradient-to-br ${gradient}
-            flex items-center justify-center text-lg
-          `}>
-            {icon}
-          </div>
-          <div>
-            <h3 className="font-semibold text-white text-sm">{agent.name}</h3>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <div className={`pulse-dot ${
-                isRunning ? 'green' : agent.status === 'error' ? 'red' : 'yellow'
-              }`}></div>
-              <span className={`text-xs ${
-                isRunning ? 'text-green-400' : 'text-gray-500'
-              }`}>
-                {isRunning ? '运行中' : agent.status === 'error' ? '错误' : '已停止'}
-              </span>
-            </div>
-          </div>
+  const st=opt||agent.status;
+
+  const on=st==='running';
+
+  async function toggle(){setBusy(true);setOpt(on?'stopped':'running');try{if(on)await stopAgent(agentKey);else await startAgent(agentKey);}catch{setOpt(null);}setTimeout(()=>{setBusy(false);setOpt(null);},1500);}
+
+  return(
+
+    <div className={`bg-gray-900 rounded-2xl p-4 border transition-all hover:translate-y-[-1px] ${on?'border-indigo-500/30 shadow-lg shadow-indigo-500/5':'border-gray-800'}`}>
+
+      <div className="flex items-center justify-between mb-3">
+
+        <div className="flex items-center gap-2">
+
+          <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${grads[agentKey]||'from-gray-600 to-gray-700'} flex items-center justify-center text-base shadow`}>{icons[agentKey]||'🤖'}</div>
+
+          <div><h3 className="font-semibold text-white text-xs">{agent.name}</h3>
+
+          <div className="flex items-center gap-1 mt-0.5"><div className={`w-1.5 h-1.5 rounded-full ${on?'bg-green-400 animate-pulse':'bg-gray-500'}`}/><span className={`text-[10px] ${on?'text-green-400':'text-gray-500'}`}>{on?`${agent.interval}s`:'停止'}</span></div></div>
+
         </div>
 
-        <button
-          onClick={toggleAgent}
-          className={`
-            px-3 py-1.5 rounded-lg text-xs font-medium transition
-            ${isRunning
-              ? 'bg-red-900/30 text-red-400 hover:bg-red-900/50'
-              : 'bg-green-900/30 text-green-400 hover:bg-green-900/50'
-            }
-          `}
-        >
-          {isRunning ? '停止' : '启动'}
-        </button>
+        <button onClick={toggle} disabled={busy} className={`px-2.5 py-1 rounded-lg text-[10px] font-medium transition-all active:scale-90 disabled:opacity-50 ${on?'bg-red-900/30 text-red-400':'bg-green-900/30 text-green-400'}`}>{busy?'...':on?'停':'启'}</button>
+
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <div>
-          <div className="text-xs text-gray-500">交易</div>
-          <div className="text-lg font-bold text-white">{agent.total_trades}</div>
-        </div>
-        <div>
-          <div className="text-xs text-gray-500">胜率</div>
-          <div className={`text-lg font-bold ${
-            agent.win_rate >= 60 ? 'text-green-400' : 
-            agent.win_rate >= 40 ? 'text-yellow-400' : 'text-red-400'
-          }`}>
-            {agent.win_rate.toFixed(0)}%
-          </div>
-        </div>
-        <div>
-          <div className="text-xs text-gray-500">盈亏</div>
-          <div className={`text-lg font-bold ${
-            (agent.total_pnl || 0) >= 0 ? 'text-green-400' : 'text-red-400'
-          }`}>
-            ${(agent.total_pnl || 0).toFixed(0)}
-          </div>
-        </div>
+      <div className="grid grid-cols-3 gap-2 text-center">
+
+        <div><div className="text-[9px] text-gray-500">交易</div><div className="text-sm font-bold text-white">{agent.total_trades}</div></div>
+
+        <div><div className="text-[9px] text-gray-500">胜率</div><div className={`text-sm font-bold ${agent.win_rate>=60?'text-green-400':'text-yellow-400'}`}>{agent.win_rate.toFixed(0)}%</div></div>
+
+        <div><div className="text-[9px] text-gray-500">盈亏</div><div className={`text-sm font-bold ${(agent.total_pnl||0)>=0?'text-green-400':'text-red-400'}`}>${(agent.total_pnl||0).toFixed(0)}</div></div>
+
       </div>
 
-      {/* Last Signal */}
-      {agent.last_signal && (
-        <div className="mt-3 p-2 bg-gray-800/50 rounded-lg">
-          <div className="text-xs text-gray-500 mb-1">最新信号</div>
-          <div className="text-xs text-gray-300 truncate">
-            {agent.last_signal}
-          </div>
-        </div>
-      )}
+      {agent.last_signal&&<div className="mt-2 p-1.5 bg-gray-800/60 rounded text-[10px] text-gray-400 truncate">{agent.last_signal}</div>}
 
-      {/* Errors */}
-      {agent.errors > 0 && (
-        <div className="mt-2 text-xs text-red-400">
-          ⚠️ {agent.errors} 个错误
-        </div>
-      )}
+      <div className="mt-1.5 flex justify-between text-[9px] text-gray-600"><span>扫:{agent.scan_count}</span><span>机会:{agent.opportunities_found}</span>{agent.errors>0&&<span className="text-red-400">❌{agent.errors}</span>}</div>
+
     </div>
+
   );
+
 }
+
